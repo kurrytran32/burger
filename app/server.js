@@ -1,21 +1,35 @@
 //dependencies for express and bodyparser
 let express = require('express');
 let bodyParser = require('body-parser');
-let path = require('path');
+
 
 // Sets up the Express App
 // =============================================================
 var app = express();
-var PORT = process.env.PORT || 8080;
+var PORT = process.env.PORT || 3000;
 
 // Sets up the Express app to handle data parsing
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-require(path.join(__dirname, './app/routing/apiRoutes.js'))(app);
-require(path.join(__dirname, './app/routing/htmlRoutes.js'))(app);
+app.use(express.static('public'));
 
+// Set Handlebars.
+var exphbs = require("express-handlebars");
 
-app.listen(PORT, function () {
-    console.log("App listening on PORT " + PORT);
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
+
+// Import routes and give the server access to them.
+var routes = require("./controllers/burgers_controller.js");
+
+app.use(routes);
+
+// Start our server so that it can begin listening to client requests.
+app.listen(PORT, function() {
+  // Log (server-side) when our server has started
+  console.log("Server listening on: http://localhost:" + PORT);
 });
+
+
+
